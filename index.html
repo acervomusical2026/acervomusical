@@ -1,0 +1,685 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="scroll-smooth">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Acervo de Fichas Técnicas | Discos Históricos</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&display=swap"
+        rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        serif: ['Playfair Display', 'serif'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#f4f6f8',
+                            100: '#e4e8ed',
+                            500: '#8a99a8',
+                            900: '#1a1d21',
+                            950: '#0d0f12',
+                        },
+                        accent: '#d4af37' // Gold accent for a premium feel
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            background-color: #0d0f12;
+            /* brand-950 */
+            color: #e4e8ed;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #1a1d21;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #374151;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #4b5563;
+        }
+
+        .glass-nav {
+            background: rgba(13, 15, 18, 0.8);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .album-card {
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .album-card:hover {
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5), 0 10px 10px -5px rgba(0, 0, 0, 0.3);
+        }
+
+        .album-card:hover .play-overlay {
+            opacity: 1;
+        }
+
+        .modal-enter {
+            animation: modalFadeIn 0.3s ease-out forwards;
+        }
+
+        .modal-exit {
+            animation: modalFadeOut 0.2s ease-in forwards;
+        }
+
+        @keyframes modalFadeIn {
+            from {
+                opacity: 0;
+                transform: scale(0.95) translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
+        }
+
+        @keyframes modalFadeOut {
+            from {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
+
+            to {
+                opacity: 0;
+                transform: scale(0.95) translateY(10px);
+            }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+    </style>
+</head>
+
+<body class="antialiased min-h-screen flex flex-col">
+
+    <!-- Navigation -->
+    <nav class="glass-nav fixed w-full z-40 top-0 transition-all duration-300">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-20">
+                <div class="flex items-center gap-8">
+                    <!-- Logo -->
+                    <div class="flex items-center gap-3 cursor-pointer" onclick="switchView('home'); clearFilters()">
+                        <div class="w-10 h-10 rounded-full bg-accent flex items-center justify-center text-brand-950">
+                            <i class="fa-solid fa-record-vinyl text-xl animate-[spin_4s_linear_infinite]"></i>
+                        </div>
+                        <span class="font-serif text-2xl font-bold tracking-wide text-white">Acervo<span
+                                class="text-accent">.</span></span>
+                    </div>
+
+                    <!-- Links de Navegação (Redirecionamento Interno SPA) -->
+                    <div class="hidden md:flex items-center gap-8">
+                        <a href="#" onclick="switchView('artistas'); return false;"
+                            class="text-gray-300 hover:text-white font-medium py-4 transition-colors">Artistas</a>
+                        <a href="#" onclick="switchView('anos'); return false;"
+                            class="text-gray-300 hover:text-white font-medium py-4 transition-colors">Anos</a>
+                        <a href="#" onclick="switchView('gravadoras'); return false;"
+                            class="text-gray-300 hover:text-white font-medium py-4 transition-colors">Gravadoras</a>
+                    </div>
+                </div>
+
+                <div class="hidden md:block">
+                    <div class="relative">
+                        <input type="text" id="searchInput" placeholder="Buscar artista ou álbum..."
+                            class="bg-brand-900 border border-gray-700 text-sm rounded-full focus:ring-accent focus:border-accent block w-64 pl-10 p-2.5 transition-all text-gray-300 placeholder-gray-500">
+                        <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                            <i class="fa-solid fa-search text-gray-500"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <header
+        class="pt-32 pb-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto w-full text-center md:text-left flex flex-col md:flex-row items-center justify-between gap-8">
+        <div class="max-w-2xl">
+            <h1 class="font-serif text-4xl md:text-6xl font-bold text-white leading-tight mb-4">
+                Preservando a <br> <span class="text-accent italic">História da Música</span>
+            </h1>
+            <p class="text-gray-400 text-lg md:text-xl font-light mb-8">
+                Explore nosso catálogo interativo de fichas técnicas. Descubra os músicos, produtores, estúdios e a arte
+                por trás dos maiores álbuns de todos os tempos.
+            </p>
+        </div>
+        <div class="hidden md:flex gap-4">
+            <div class="text-center p-4 bg-brand-900 rounded-2xl border border-gray-800">
+                <span class="block text-3xl font-serif text-white mb-1" id="totalAlbums">0</span>
+                <span class="text-xs text-gray-500 uppercase tracking-wider font-semibold">Álbuns Catalogados</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content / Gallery Grid -->
+    <main class="flex-grow px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto w-full pb-24">
+
+        <!-- VIEW: HOME (Galeria Principal) -->
+        <div id="view-home" class="view-section block">
+            <!-- Filtros Ativos -->
+            <div id="activeFilters"
+                class="hidden items-center gap-3 mb-6 bg-brand-900/50 p-3 rounded-lg border border-gray-800 w-fit">
+                <span class="text-sm text-gray-400"><i class="fa-solid fa-filter mr-1"></i> Filtrando por:</span>
+                <span id="filterLabel"
+                    class="px-3 py-1 bg-accent/20 border border-accent text-accent rounded-full text-sm font-medium"></span>
+                <button onclick="clearFilters()"
+                    class="ml-2 text-xs text-gray-500 hover:text-white hover:underline transition">
+                    <i class="fa-solid fa-times mr-1"></i> Limpar
+                </button>
+            </div>
+
+            <div class="flex justify-between items-end mb-8 border-b border-gray-800 pb-4">
+                <h2 class="text-2xl font-serif text-white">Catálogo Recente</h2>
+                <div class="flex gap-2">
+                    <button class="text-gray-400 hover:text-white transition"><i
+                            class="fa-solid fa-border-all"></i></button>
+                    <button class="text-gray-600 hover:text-gray-400 transition"><i
+                            class="fa-solid fa-list"></i></button>
+                </div>
+            </div>
+
+            <div id="catalogGrid" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6 gap-y-10">
+                <!-- Os cards serão injetados aqui via JS -->
+            </div>
+
+            <!-- Empty State (Busca) -->
+            <div id="emptyState" class="hidden py-20 text-center">
+                <i class="fa-solid fa-compact-disc text-6xl text-gray-700 mb-4"></i>
+                <h3 class="text-xl text-gray-300 font-medium">Nenhum álbum encontrado</h3>
+                <p class="text-gray-500 mt-2">Tente buscar por outros termos.</p>
+            </div>
+        </div> <!-- Fim View Home -->
+
+        <!-- VIEW: ARTISTAS -->
+        <div id="view-artistas" class="view-section hidden">
+            <h2 class="text-3xl font-serif text-white mb-8 border-b border-gray-800 pb-4"><i
+                    class="fa-solid fa-users text-accent mr-3"></i>Navegar por Artistas</h2>
+            <div id="artistasGrid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4"></div>
+        </div>
+
+        <!-- VIEW: ANOS -->
+        <div id="view-anos" class="view-section hidden">
+            <h2 class="text-3xl font-serif text-white mb-8 border-b border-gray-800 pb-4"><i
+                    class="fa-solid fa-calendar-days text-accent mr-3"></i>Navegar por Anos</h2>
+            <div id="anosGrid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4"></div>
+        </div>
+
+        <!-- VIEW: GRAVADORAS -->
+        <div id="view-gravadoras" class="view-section hidden">
+            <h2 class="text-3xl font-serif text-white mb-8 border-b border-gray-800 pb-4"><i
+                    class="fa-solid fa-record-vinyl text-accent mr-3"></i>Navegar por Gravadoras</h2>
+            <div id="gravadorasGrid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4"></div>
+        </div>
+
+    </main>
+
+    <!-- Modal de Detalhes do Álbum -->
+    <div id="albumModal" class="fixed inset-0 z-50 hidden" aria-labelledby="modal-title" role="dialog"
+        aria-modal="true">
+        <!-- Backdrop -->
+        <div class="fixed inset-0 bg-black/90 backdrop-blur-sm transition-opacity" id="modalBackdrop"></div>
+
+        <div class="fixed inset-0 z-10 overflow-y-auto">
+            <div class="flex min-h-full items-center justify-center p-0 md:p-4 text-center sm:p-0">
+
+                <!-- Modal Panel -->
+                <div id="modalPanel"
+                    class="relative transform overflow-hidden bg-brand-950 md:rounded-2xl border border-gray-800 text-left shadow-2xl transition-all w-full h-full md:h-auto md:max-w-6xl flex flex-col md:flex-row modal-exit">
+
+                    <!-- Botão Fechar Modal -->
+                    <button onclick="closeModal()"
+                        class="absolute top-4 right-4 z-20 w-10 h-10 bg-black/50 hover:bg-accent hover:text-brand-950 text-white rounded-full flex items-center justify-center transition-all backdrop-blur-md">
+                        <i class="fa-solid fa-times text-lg"></i>
+                    </button>
+
+                    <!-- Lado Esquerdo: Galeria de Imagens -->
+                    <div
+                        class="w-full md:w-2/5 bg-black p-6 flex flex-col gap-4 border-r border-gray-800 sticky top-0 md:relative h-[50vh] md:h-auto overflow-hidden">
+
+                        <!-- Imagem Principal -->
+                        <div
+                            class="relative w-full aspect-square rounded-xl overflow-hidden group bg-brand-900 border border-gray-800 shadow-2xl">
+                            <img id="modalMainImg" src="" alt="Capa"
+                                class="w-full h-full object-cover fade-in cursor-zoom-in transition-transform duration-500 group-hover:scale-105"
+                                onclick="toggleFullscreen(this)">
+                            <div class="absolute bottom-3 left-3 bg-black/70 backdrop-blur text-xs px-2 py-1 rounded text-gray-300 pointer-events-none"
+                                id="modalImgCaption">Capa Frontal</div>
+                        </div>
+
+                        <!-- Miniaturas da Galeria -->
+                        <div class="mt-auto">
+                            <h4 class="text-xs uppercase tracking-wider text-gray-500 mb-3 font-semibold">Galeria de
+                                Encartes</h4>
+                            <div id="modalThumbnails" class="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
+                                <!-- Miniaturas injetadas via JS -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Lado Direito: Ficha Técnica -->
+                    <div class="w-full md:w-3/5 p-6 md:p-10 overflow-y-auto max-h-[100vh] md:max-h-[85vh]">
+
+                        <!-- Cabeçalho do Álbum -->
+                        <div class="mb-8">
+                            <span id="modalGenre"
+                                class="inline-block px-3 py-1 bg-gray-800 text-accent text-xs font-semibold rounded-full tracking-wide mb-3"></span>
+                            <h2 id="modalTitle"
+                                class="text-3xl md:text-5xl font-serif font-bold text-white mb-2 leading-tight"></h2>
+                            <h3 id="modalArtist" class="text-xl md:text-2xl text-gray-400 font-light"></h3>
+                        </div>
+
+                        <!-- Metadados Rápidos (Grid) -->
+                        <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-10 pb-8 border-b border-gray-800">
+                            <div>
+                                <p class="text-xs text-gray-500 uppercase tracking-wider mb-1">Lançamento</p>
+                                <p id="modalYear" class="text-white font-medium"></p>
+                            </div>
+                            <div>
+                                <p class="text-xs text-gray-500 uppercase tracking-wider mb-1">Gravadora</p>
+                                <p id="modalLabel" class="text-white font-medium"></p>
+                            </div>
+                            <div>
+                                <p class="text-xs text-gray-500 uppercase tracking-wider mb-1">Duração</p>
+                                <p id="modalDuration" class="text-white font-medium"></p>
+                            </div>
+                            <div>
+                                <p class="text-xs text-gray-500 uppercase tracking-wider mb-1">Catálogo</p>
+                                <p id="modalCatalog" class="text-white font-medium"></p>
+                            </div>
+                        </div>
+
+                        <!-- Layout de Colunas para Tracklist e Ficha Técnica -->
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-10">
+
+                            <!-- Tracklist -->
+                            <div>
+                                <h4 class="text-lg font-serif text-white mb-4 border-l-2 border-accent pl-3">Lista de
+                                    Faixas</h4>
+                                <ul id="modalTracklist" class="space-y-2 text-sm text-gray-400">
+                                    <!-- Injetado via JS -->
+                                </ul>
+                            </div>
+
+                            <!-- Ficha Técnica (Créditos) -->
+                            <div>
+                                <h4 class="text-lg font-serif text-white mb-4 border-l-2 border-accent pl-3">Ficha
+                                    Técnica</h4>
+                                <div id="modalCredits" class="space-y-4">
+                                    <!-- Injetado via JS -->
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <!-- Notas / Descrição -->
+                        <div class="mt-10 pt-8 border-t border-gray-800">
+                            <h4 class="text-lg font-serif text-white mb-3">Sobre o Álbum</h4>
+                            <p id="modalDescription" class="text-gray-400 text-sm leading-relaxed text-justify"></p>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Fullscreen Image Viewer -->
+    <div id="fullscreenViewer"
+        class="fixed inset-0 z-[60] hidden bg-black/95 items-center justify-center backdrop-blur-lg"
+        onclick="closeFullscreen()">
+        <button class="absolute top-6 right-6 text-white text-3xl hover:text-accent transition"><i
+                class="fa-solid fa-times"></i></button>
+        <img id="fullscreenImg" src="" class="max-h-[90vh] max-w-[90vw] object-contain shadow-2xl" alt="Fullscreen">
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-black py-8 border-t border-gray-900 mt-auto text-center">
+        <p class="text-gray-600 text-sm">© 2026 Acervo de Fichas Técnicas. Demonstração.</p>
+    </footer>
+
+    <script>
+        // Mock Data - Discos Clássicos com URLs de placeholders de alta qualidade 
+        const API_URL = 'https://script.google.com/macros/s/AKfycbyoztioVcbFm1T1ydOwal5nRVxLqwO6UfCepu2eZPtXBDnrVMiQXlV5fOYWxf9XzBrbFg/exec';
+        let discos = [];
+
+        async function carregarDiscos() {
+            try {
+                const response = await fetch(API_URL);
+                discos = await response.json();
+                renderizarGaleria(discos);
+                gerarFiltros();
+            } catch (error) {
+                console.error("Erro ao carregar os dados:", error);
+            }
+        }
+
+        // Chama a função assim que a página carregar
+        carregarDiscos();
+
+        // Elementos DOM
+        const catalogGrid = document.getElementById('catalogGrid');
+        const emptyState = document.getElementById('emptyState');
+        const searchInput = document.getElementById('searchInput');
+        const totalAlbums = document.getElementById('totalAlbums');
+
+        // Renderizar a Galeria
+        function renderCatalog(albums) {
+            catalogGrid.innerHTML = '';
+            totalAlbums.innerText = db.length; // Sempre mostrar o total real no header
+
+            if (albums.length === 0) {
+                catalogGrid.classList.add('hidden');
+                emptyState.classList.remove('hidden');
+                return;
+            }
+
+            catalogGrid.classList.remove('hidden');
+            emptyState.classList.add('hidden');
+
+            albums.forEach(album => {
+                const card = document.createElement('div');
+                card.className = 'album-card cursor-pointer group flex flex-col h-full';
+                card.onclick = () => openModal(album.id);
+
+                card.innerHTML = `
+                    <div class="relative w-full aspect-square rounded-lg overflow-hidden mb-3 bg-brand-900 border border-gray-800 shadow-md">
+                        <img src="${album.cover}" alt="${album.title}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110">
+                        <div class="play-overlay absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 transition-opacity duration-300">
+                            <div class="w-12 h-12 rounded-full bg-accent text-brand-950 flex items-center justify-center shadow-lg transform scale-90 group-hover:scale-100 transition-transform">
+                                <i class="fa-solid fa-list-ul"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="px-1 flex-grow flex flex-col justify-between">
+                        <div>
+                            <h3 class="text-white font-serif font-bold text-lg leading-tight mb-1 truncate">${album.title}</h3>
+                            <p class="text-gray-400 text-sm truncate">${album.artist}</p>
+                        </div>
+                        <div class="mt-2 flex items-center justify-between text-xs text-gray-500">
+                            <span>${album.year}</span>
+                            <span class="px-2 py-0.5 bg-gray-800 rounded text-gray-300">${album.label}</span>
+                        </div>
+                    </div>
+                `;
+                catalogGrid.appendChild(card);
+            });
+        }
+
+        // Lógica de Busca
+        searchInput.addEventListener('input', (e) => {
+            const term = e.target.value.toLowerCase();
+            const filtered = db.filter(a =>
+                a.title.toLowerCase().includes(term) ||
+                a.artist.toLowerCase().includes(term) ||
+                a.year.toString().includes(term)
+            );
+            renderCatalog(filtered);
+        });
+
+        // Elementos do Modal
+        const modal = document.getElementById('albumModal');
+        const modalPanel = document.getElementById('modalPanel');
+
+        function openModal(id) {
+            const album = db.find(a => a.id === id);
+            if (!album) return;
+
+            // Preencher Textos
+            document.getElementById('modalTitle').innerText = album.title;
+            document.getElementById('modalArtist').innerText = album.artist;
+            document.getElementById('modalGenre').innerText = album.genre;
+            document.getElementById('modalYear').innerText = album.year;
+            document.getElementById('modalLabel').innerText = album.label;
+            document.getElementById('modalDuration').innerText = album.duration;
+            document.getElementById('modalCatalog').innerText = album.catalog;
+            document.getElementById('modalDescription').innerText = album.description;
+
+            // Galeria
+            setMainImage(album.gallery[0].url, album.gallery[0].caption);
+            const thumbsContainer = document.getElementById('modalThumbnails');
+            thumbsContainer.innerHTML = '';
+
+            album.gallery.forEach((img, index) => {
+                const btn = document.createElement('button');
+                btn.className = `flex-shrink-0 w-16 h-16 rounded-md overflow-hidden border-2 transition-all ${index === 0 ? 'border-accent scale-105' : 'border-transparent opacity-60 hover:opacity-100 hover:border-gray-500'}`;
+                btn.onclick = () => {
+                    setMainImage(img.url, img.caption);
+                    // Update active state
+                    Array.from(thumbsContainer.children).forEach(c => {
+                        c.classList.remove('border-accent', 'scale-105');
+                        c.classList.add('border-transparent', 'opacity-60');
+                    });
+                    btn.classList.add('border-accent', 'scale-105');
+                    btn.classList.remove('border-transparent', 'opacity-60');
+                };
+                btn.innerHTML = `<img src="${img.url}" class="w-full h-full object-cover" alt="Thumbnail">`;
+                thumbsContainer.appendChild(btn);
+            });
+
+            // Tracklist
+            const tracklistEl = document.getElementById('modalTracklist');
+            tracklistEl.innerHTML = '';
+            album.tracks.forEach(track => {
+                const isSide = track.startsWith("Lado");
+                const li = document.createElement('li');
+                li.className = isSide ? 'mt-4 mb-2 font-semibold text-accent text-xs uppercase tracking-wider' : 'flex justify-between py-1 border-b border-gray-800/50 last:border-0 hover:text-gray-200 transition';
+                li.innerHTML = isSide ? track : `<span>${track.split('(')[0]}</span> <span class="text-gray-500 text-xs">${track.match(/\((.*?)\)/)?.[1] || ''}</span>`;
+                tracklistEl.appendChild(li);
+            });
+
+            // Créditos
+            const creditsEl = document.getElementById('modalCredits');
+            creditsEl.innerHTML = '';
+            for (const [role, names] of Object.entries(album.credits)) {
+                const div = document.createElement('div');
+                div.className = 'flex flex-col mb-2';
+                div.innerHTML = `
+                    <span class="text-xs text-gray-500 uppercase tracking-wider">${role}</span>
+                    <span class="text-sm text-gray-300">${names}</span>
+                `;
+                creditsEl.appendChild(div);
+            }
+
+            // Animar entrada
+            modal.classList.remove('hidden');
+            modalPanel.classList.remove('modal-exit');
+            modalPanel.classList.add('modal-enter');
+            document.body.style.overflow = 'hidden'; // Evitar scroll de fundo
+        }
+
+        function setMainImage(url, caption) {
+            const mainImg = document.getElementById('modalMainImg');
+            // Resetar a animação trocando o nó (pequeno truque de reflow)
+            mainImg.classList.remove('fade-in');
+            void mainImg.offsetWidth;
+
+            mainImg.src = url;
+            mainImg.classList.add('fade-in');
+            document.getElementById('modalImgCaption').innerText = caption;
+        }
+
+        function closeModal() {
+            modalPanel.classList.remove('modal-enter');
+            modalPanel.classList.add('modal-exit');
+
+            // Esperar animação terminar
+            setTimeout(() => {
+                modal.classList.add('hidden');
+                document.body.style.overflow = '';
+            }, 200);
+        }
+
+        // Fechar com ESC ou clicando fora
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && !modal.classList.contains('hidden')) {
+                if (!document.getElementById('fullscreenViewer').classList.contains('hidden')) {
+                    closeFullscreen();
+                } else {
+                    closeModal();
+                }
+            }
+        });
+        document.getElementById('modalBackdrop').addEventListener('click', closeModal);
+
+        const fullscreenViewer = document.getElementById('fullscreenViewer');
+        const fullscreenImg = document.getElementById('fullscreenImg');
+
+        function toggleFullscreen(imgElement) {
+            fullscreenImg.src = imgElement.src;
+            fullscreenViewer.classList.remove('hidden');
+            fullscreenViewer.classList.add('flex');
+        }
+
+        function closeFullscreen() {
+            fullscreenViewer.classList.add('hidden');
+            fullscreenViewer.classList.remove('flex');
+        }
+
+        function applyFilter(type, value) {
+            // Limpar busca de texto se houver
+            searchInput.value = '';
+
+            const filtered = db.filter(a => a[type] === value);
+            renderCatalog(filtered);
+
+            // Mostrar UI de filtro ativo
+            const activeFilters = document.getElementById('activeFilters');
+            const filterLabel = document.getElementById('filterLabel');
+
+            activeFilters.classList.remove('hidden');
+            activeFilters.classList.add('flex');
+
+            let typeName = type === 'artist' ? 'Artista' : (type === 'year' ? 'Ano' : 'Gravadora');
+            filterLabel.innerHTML = `<b>${typeName}:</b> ${value}`;
+        }
+
+        function clearFilters() {
+            // Esconder UI de filtro
+            const activeFilters = document.getElementById('activeFilters');
+            activeFilters.classList.add('hidden');
+            activeFilters.classList.remove('flex');
+
+            // Limpar busca e resetar
+            searchInput.value = '';
+            renderCatalog(db);
+            window.scrollTo(0, 0);
+        }
+
+        function switchView(viewName) {
+            // Esconder todas as views
+            document.querySelectorAll('.view-section').forEach(el => {
+                el.classList.add('hidden');
+                el.classList.remove('block');
+            });
+
+            // Mostrar a view desejada
+            const target = document.getElementById(`view-${viewName}`);
+            if (target) {
+                target.classList.remove('hidden');
+                target.classList.add('block');
+            }
+
+            // Renderizar os dados da view específica se não for a home
+            if (viewName === 'artistas') renderCategoryView('artist', 'artistasGrid');
+            if (viewName === 'anos') renderCategoryView('year', 'anosGrid');
+            if (viewName === 'gravadoras') renderCategoryView('label', 'gravadorasGrid');
+
+            window.scrollTo(0, 0);
+        }
+
+        // Função para transformar link de compartilhamento do Drive em link direto de imagem
+        function converterLinkDrive(url) {
+            if (!url) return '';
+
+            // Tenta encontrar o ID no link padrão do Drive
+            const match = url.match(/\/d\/([a-zA-Z0-9_-]+)/) || url.match(/id=([a-zA-Z0-9_-]+)/);
+
+            // Se encontrou o ID, monta o link direto
+            if (match && match[1]) {
+                return `https://drive.google.com/uc?export=view&id=${match[1]}`;
+            }
+
+            // Se não for um link do Drive, retorna o URL original
+            return url.trim();
+        }
+
+        disco.encartes.forEach(encarteUrl => {
+            const linkDireto = converterLinkDrive(encarteUrl);
+            // Adiciona a imagem no modal usando o linkDireto...
+        });
+
+        function renderCategoryView(type, gridId) {
+            const grid = document.getElementById(gridId);
+            grid.innerHTML = '';
+
+            // Obter itens únicos da base de dados e ordenar
+            const items = [...new Set(db.map(a => a[type]))].sort();
+
+            items.forEach(item => {
+                // Contar quantos álbuns existem para este item
+                const count = db.filter(a => a[type] === item).length;
+
+                const card = document.createElement('div');
+                card.className = 'bg-brand-900 border border-gray-800 p-6 rounded-xl hover:bg-brand-800 hover:border-gray-600 cursor-pointer transition-all flex flex-col items-center justify-center text-center group shadow-sm hover:shadow-md hover:-translate-y-1';
+
+                // Ao clicar no card, volta para a home e aplica o filtro
+                card.onclick = () => {
+                    switchView('home');
+                    applyFilter(type, item);
+                };
+
+                card.innerHTML = `
+                    <span class="text-xl text-white font-serif mb-3 group-hover:text-accent transition-colors line-clamp-2">${item}</span>
+                    <span class="text-xs text-gray-400 bg-black/60 border border-gray-700 px-3 py-1 rounded-full"><i class="fa-solid fa-compact-disc mr-1"></i> ${count} álbum(ns)</span>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        // Inicializar
+        window.onload = () => {
+            renderCatalog(db);
+        };
+
+    </script>
+</body>
+
+</html>
