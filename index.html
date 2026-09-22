@@ -232,7 +232,8 @@
 
                         <div>
                             <h4 class="text-lg font-serif text-white mb-4 border-l-2 border-accent pl-3">Ficha Técnica</h4>
-                            <div id="modalCredits" class="space-y-4 text-gray-300 text-sm leading-relaxed whitespace-pre-line"></div>
+                            <!-- Adicionada formatação inteligente para negritar o título antes dos dois pontos -->
+                            <div id="modalCredits" class="space-y-3 text-gray-300 text-sm leading-relaxed"></div>
                         </div>
                     </div>
                 </div>
@@ -319,25 +320,41 @@
                     }
 
                     // ====== SEPARAÇÃO MÚLTIPLA DE ARTISTAS E GRAVADORAS ======
-                    // Regex quebra por vírgula, ponto-e-vírgula, " e ", " E ", " & "
                     const separador = /\s+(?:e|E|&)\s+|,|;/;
 
                     const listaArtistas = item.artista ? String(item.artista).split(separador).map(s => s.trim()).filter(Boolean) : ['Artista Desconhecido'];
                     const listaGravadoras = item.gravadora ? String(item.gravadora).split(separador).map(s => s.trim()).filter(Boolean) : ['Independente'];
 
+                    // ====== FORMATAÇÃO DA FICHA TÉCNICA (NEGRITO ANTES DOS DOIS PONTOS) ======
+                    let fichaFormatada = "";
+                    if (item.ficha) {
+                        const linhas = String(item.ficha).split('\n');
+                        fichaFormatada = linhas.map(linha => {
+                            if (linha.includes(':')) {
+                                const partes = linha.split(':');
+                                const rotulo = partes[0].trim();
+                                const valor = partes.slice(1).join(':').trim();
+                                return `<div><strong class="text-white font-semibold">${rotulo}:</strong> <span class="text-gray-300">${valor}</span></div>`;
+                            }
+                            return `<div>${linha}</div>`;
+                        }).join('');
+                    } else {
+                        fichaFormatada = "Ficha técnica não cadastrada.";
+                    }
+
                     return {
                         id: item.id || Math.random().toString(36).substr(2, 9),
                         title: item.titulo || 'Sem Título',
                         artist: item.artista || 'Artista Desconhecido',
-                        artistList: listaArtistas,   // Usado no menu de Artistas
+                        artistList: listaArtistas,
                         fullDate: dataModal,
                         year: anoMenu,       
-                        yearList: [anoMenu],         // Usado no menu de Anos
+                        yearList: [anoMenu],
                         label: item.gravadora || 'Independente',
-                        labelList: listaGravadoras,  // Usado no menu de Gravadoras
+                        labelList: listaGravadoras,
                         cover: coverUrl,
                         gallery: gallery,
-                        credits: item.ficha || "Ficha técnica não cadastrada."
+                        credits: fichaFormatada
                     };
                 });
 
@@ -419,7 +436,7 @@
             document.getElementById('modalArtist').innerText = album.artist;
             document.getElementById('modalYear').innerText = album.fullDate; 
             document.getElementById('modalLabel').innerText = album.label;
-            document.getElementById('modalCredits').innerText = album.credits;
+            document.getElementById('modalCredits').innerHTML = album.credits; // Usa innerHTML para processar as tags HTML de negrito
 
             setMainImage(album.gallery[0].url, album.gallery[0].caption);
             const thumbsContainer = document.getElementById('modalThumbnails');
