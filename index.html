@@ -251,18 +251,16 @@
     </footer>
 
     <script>
-        // === MANTIDA A SUA URL ===
+        // === SUA URL DO GOOGLE APPS SCRIPT ===
         const API_URL = 'https://script.google.com/macros/s/AKfycbyoztioVcbFm1T1ydOwal5nRVxLqwO6UfCepu2eZPtXBDnrVMiQXlV5fOYWxf9XzBrbFg/exec';
         
         let db = []; 
 
-        // Função CORRIGIDA para usar a miniatura do Drive (resolve o erro de imagem indisponível)
         function converterLinkDrive(url) {
             if (!url) return '';
             const textoUrl = String(url).trim();
             const match = textoUrl.match(/\/d\/([a-zA-Z0-9_-]+)/) || textoUrl.match(/id=([a-zA-Z0-9_-]+)/);
             if (match && match[1]) {
-                // O endpoint 'thumbnail' é a forma mais segura de contornar os bloqueios de segurança do Google
                 return `https://drive.google.com/thumbnail?id=${match[1]}&sz=w1000`;
             }
             return textoUrl;
@@ -281,7 +279,6 @@
                     let gallery = [{ url: coverUrl, caption: "Capa Frontal" }];
                     
                     if (item.encartes) {
-                        // Trata o caso de vir como texto separado por vírgula na planilha
                         const listaEncartes = Array.isArray(item.encartes) ? item.encartes : String(item.encartes).split(',');
                         listaEncartes.forEach((encarteUrl, idx) => {
                             if (encarteUrl && encarteUrl.trim() !== '') {
@@ -293,32 +290,38 @@
                         });
                     }
 
-                    // ====== LÓGICA DE DATA CORRIGIDA ======
+                    // ====== TRATAMENTO DE DATA ======
                     let dataCrua = item.ano;
-                    let dataModal = 'N/A'; // Para a Ficha (Ex: 21/08/1997)
-                    let anoMenu = 'N/A';   // Para os menus/cards (Ex: 1997)
+                    let dataModal = 'N/A'; 
+                    let anoMenu = 'N/A';   
 
-                    if (dataCrua) {
-                        // Forçamos a conversão para String para evitar bugs de tipagem
+                    if (dataCrua !== undefined && dataCrua !== null && String(dataCrua).trim() !== '') {
                         let textoData = String(dataCrua).trim();
 
-                        // 1. Se vier no formato ISO do banco (Ex: 1997-08-21T03:00:00.000Z)
                         if (textoData.includes('T') && textoData.includes('-')) {
-                            let dataParte = textoData.split('T')[0]; // "1997-08-21"
-                            let partes = dataParte.split('-'); // ["1997", "08", "21"]
+                            let dataParte = textoData.split('T')[0]; 
+                            let partes = dataParte.split('-'); 
                             if(partes.length === 3) {
-                                anoMenu = partes[0]; // 1997
-                                dataModal = `${partes[2]}/${partes[1]}/${partes[0]}`; // 21/08/1997
+                                anoMenu = partes[0]; 
+                                dataModal = `${partes[2]}/${partes[1]}/${partes[0]}`; 
                             } else {
-                        dataModal = 'N/A';
-                        anoMenu = 'N/A';
+                                dataModal = textoData;
+                                anoMenu = textoData;
+                            }
+                        } else if (textoData.includes('/')) {
+                            let partes = textoData.split('/');
+                            dataModal = textoData;
+                            anoMenu = partes[partes.length - 1].trim();
+                        } else {
+                            dataModal = textoData;
+                            anoMenu = textoData;
+                        }
                     }
-                    // =========================================
 
-                    // LÓGICA DE SEPARAÇÃO MULTIPLA (Artistas e Gravadoras)
-                    // O regex "/\s+(?:e|&)\s+|,|;/i" quebra o texto em vírgulas, ponto e vírgula, " e " ou " & "
-                    const separador = /\s+(?:e|&)\s+|,|;/i;
-                    
+                    // ====== SEPARAÇÃO MÚLTIPLA DE ARTISTAS E GRAVADORAS ======
+                    // Regex quebra por vírgula, ponto-e-vírgula, " e ", " E ", " & "
+                    const separador = /\s+(?:e|E|&)\s+|,|;/;
+
                     const listaArtistas = item.artista ? String(item.artista).split(separador).map(s => s.trim()).filter(Boolean) : ['Artista Desconhecido'];
                     const listaGravadoras = item.gravadora ? String(item.gravadora).split(separador).map(s => s.trim()).filter(Boolean) : ['Independente'];
 
@@ -326,12 +329,12 @@
                         id: item.id || Math.random().toString(36).substr(2, 9),
                         title: item.titulo || 'Sem Título',
                         artist: item.artista || 'Artista Desconhecido',
-                        artistList: listaArtistas,   // Usado no Menu de Artistas
+                        artistList: listaArtistas,   // Usado no menu de Artistas
                         fullDate: dataModal,
                         year: anoMenu,       
-                        yearList: [anoMenu],         // Usado no Menu de Anos
+                        yearList: [anoMenu],         // Usado no menu de Anos
                         label: item.gravadora || 'Independente',
-                        labelList: listaGravadoras,  // Usado no Menu de Gravadoras
+                        labelList: listaGravadoras,  // Usado no menu de Gravadoras
                         cover: coverUrl,
                         gallery: gallery,
                         credits: item.ficha || "Ficha técnica não cadastrada."
@@ -386,7 +389,7 @@
                             <p class="text-gray-400 text-sm truncate">${album.artist}</p>
                         </div>
                         <div class="mt-2 flex items-center justify-between text-xs text-gray-500">
-                            <span>${album.year}</span> <!-- Aqui aparece só o ano -->
+                            <span>${album.year}</span>
                             <span class="px-2 py-0.5 bg-gray-800 rounded text-gray-300">${album.label}</span>
                         </div>
                     </div>
@@ -487,7 +490,6 @@
         function applyFilter(type, value) {
             document.getElementById('searchInput').value = '';
             
-            // Agora verificamos dentro da "List" que criamos (artistList, yearList ou labelList)
             const listField = type + 'List';
             const filtered = db.filter(a => a[listField] && a[listField].includes(value));
             
@@ -527,13 +529,10 @@
             grid.innerHTML = '';
             
             const listField = type + 'List';
-            
-            // Junta todas as listas de todos os discos em um único arrayzão e remove os repetidos
             const todosOsItens = db.flatMap(a => a[listField] || []);
             const itensUnicos = [...new Set(todosOsItens)].sort();
             
             itensUnicos.forEach(item => {
-                // Conta em quantos álbuns esse artista/ano/gravadora específico aparece
                 const count = db.filter(a => a[listField] && a[listField].includes(item)).length;
                 
                 const card = document.createElement('div');
