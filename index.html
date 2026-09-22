@@ -310,30 +310,28 @@
                                 anoMenu = partes[0]; // 1997
                                 dataModal = `${partes[2]}/${partes[1]}/${partes[0]}`; // 21/08/1997
                             } else {
-                                anoMenu = textoData; dataModal = textoData;
-                            }
-                        } 
-                        // 2. Se a pessoa digitou direto no formato BR (Ex: 21/08/1997)
-                        else if (textoData.includes('/')) {
-                            let partes = textoData.split('/');
-                            dataModal = textoData;
-                            anoMenu = partes[partes.length - 1]; // Pega o último item (o ano)
-                        } 
-                        // 3. Se for apenas o ano (Ex: 1973)
-                        else {
-                            dataModal = textoData;
-                            anoMenu = textoData;
-                        }
+                        dataModal = 'N/A';
+                        anoMenu = 'N/A';
                     }
-                    // =====================================
+                    // =========================================
+
+                    // LÓGICA DE SEPARAÇÃO MULTIPLA (Artistas e Gravadoras)
+                    // O regex "/\s+(?:e|&)\s+|,|;/i" quebra o texto em vírgulas, ponto e vírgula, " e " ou " & "
+                    const separador = /\s+(?:e|&)\s+|,|;/i;
+                    
+                    const listaArtistas = item.artista ? String(item.artista).split(separador).map(s => s.trim()).filter(Boolean) : ['Artista Desconhecido'];
+                    const listaGravadoras = item.gravadora ? String(item.gravadora).split(separador).map(s => s.trim()).filter(Boolean) : ['Independente'];
 
                     return {
                         id: item.id || Math.random().toString(36).substr(2, 9),
                         title: item.titulo || 'Sem Título',
                         artist: item.artista || 'Artista Desconhecido',
-                        fullDate: dataModal, 
+                        artistList: listaArtistas,   // Usado no Menu de Artistas
+                        fullDate: dataModal,
                         year: anoMenu,       
+                        yearList: [anoMenu],         // Usado no Menu de Anos
                         label: item.gravadora || 'Independente',
+                        labelList: listaGravadoras,  // Usado no Menu de Gravadoras
                         cover: coverUrl,
                         gallery: gallery,
                         credits: item.ficha || "Ficha técnica não cadastrada."
@@ -488,7 +486,11 @@
 
         function applyFilter(type, value) {
             document.getElementById('searchInput').value = '';
-            const filtered = db.filter(a => a[type] === value);
+            
+            // Agora verificamos dentro da "List" que criamos (artistList, yearList ou labelList)
+            const listField = type + 'List';
+            const filtered = db.filter(a => a[listField] && a[listField].includes(value));
+            
             renderCatalog(filtered);
             
             const af = document.getElementById('activeFilters');
@@ -523,10 +525,17 @@
         function renderCategoryView(type, gridId) {
             const grid = document.getElementById(gridId);
             grid.innerHTML = '';
-            const items = [...new Set(db.map(a => a[type]))].sort();
             
-            items.forEach(item => {
-                const count = db.filter(a => a[type] === item).length;
+            const listField = type + 'List';
+            
+            // Junta todas as listas de todos os discos em um único arrayzão e remove os repetidos
+            const todosOsItens = db.flatMap(a => a[listField] || []);
+            const itensUnicos = [...new Set(todosOsItens)].sort();
+            
+            itensUnicos.forEach(item => {
+                // Conta em quantos álbuns esse artista/ano/gravadora específico aparece
+                const count = db.filter(a => a[listField] && a[listField].includes(item)).length;
+                
                 const card = document.createElement('div');
                 card.className = 'bg-brand-900 border border-gray-800 p-6 rounded-xl hover:bg-brand-800 hover:border-gray-600 cursor-pointer transition-all flex flex-col items-center justify-center text-center group shadow-sm hover:shadow-md hover:-translate-y-1';
                 
