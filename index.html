@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="pt-BR" class="scroll-smooth">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,8 +9,10 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
-    
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&display=swap"
+        rel="stylesheet">
+
     <script>
         tailwind.config = {
             theme: {
@@ -35,24 +38,14 @@
 
     <style>
         body {
-            background-color: #0d0f12; /* brand-950 */
+            background-color: #0d0f12;
             color: #e4e8ed;
         }
-        
-        /* Custom Scrollbar */
-        ::-webkit-scrollbar {
-            width: 8px;
-        }
-        ::-webkit-scrollbar-track {
-            background: #1a1d21;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #374151;
-            border-radius: 4px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: #4b5563;
-        }
+
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #1a1d21; }
+        ::-webkit-scrollbar-thumb { background: #374151; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #4b5563; }
 
         .glass-nav {
             background: rgba(13, 15, 18, 0.8);
@@ -61,23 +54,15 @@
             border-bottom: 1px solid rgba(255, 255, 255, 0.05);
         }
 
-        .album-card {
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        }
+        .album-card { transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
         .album-card:hover {
             transform: translateY(-8px) scale(1.02);
             box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5), 0 10px 10px -5px rgba(0, 0, 0, 0.3);
         }
-        .album-card:hover .play-overlay {
-            opacity: 1;
-        }
+        .album-card:hover .play-overlay { opacity: 1; }
 
-        .modal-enter {
-            animation: modalFadeIn 0.3s ease-out forwards;
-        }
-        .modal-exit {
-            animation: modalFadeOut 0.2s ease-in forwards;
-        }
+        .modal-enter { animation: modalFadeIn 0.3s ease-out forwards; }
+        .modal-exit { animation: modalFadeOut 0.2s ease-in forwards; }
 
         @keyframes modalFadeIn {
             from { opacity: 0; transform: scale(0.95) translateY(10px); }
@@ -88,15 +73,14 @@
             to { opacity: 0; transform: scale(0.95) translateY(10px); }
         }
 
-        .fade-in {
-            animation: fadeIn 0.5s ease-in-out;
-        }
+        .fade-in { animation: fadeIn 0.5s ease-in-out; }
         @keyframes fadeIn {
             from { opacity: 0; }
             to { opacity: 1; }
         }
     </style>
 </head>
+
 <body class="antialiased min-h-screen flex flex-col">
 
     <!-- Navigation -->
@@ -112,7 +96,7 @@
                         <span class="font-serif text-2xl font-bold tracking-wide text-white">Acervo<span class="text-accent">.</span></span>
                     </div>
 
-                    <!-- Links de Navegação (Redirecionamento Interno SPA) -->
+                    <!-- Links de Navegação -->
                     <div class="hidden md:flex items-center gap-8">
                         <a href="#" onclick="switchView('artistas'); return false;" class="text-gray-300 hover:text-white font-medium py-4 transition-colors">Artistas</a>
                         <a href="#" onclick="switchView('anos'); return false;" class="text-gray-300 hover:text-white font-medium py-4 transition-colors">Anos</a>
@@ -122,7 +106,7 @@
 
                 <div class="hidden md:block">
                     <div class="relative">
-                        <input type="text" id="searchInput" placeholder="Buscar artista ou álbum..." 
+                        <input type="text" id="searchInput" placeholder="Buscar artista ou álbum..."
                             class="bg-brand-900 border border-gray-700 text-sm rounded-full focus:ring-accent focus:border-accent block w-64 pl-10 p-2.5 transition-all text-gray-300 placeholder-gray-500">
                         <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
                             <i class="fa-solid fa-search text-gray-500"></i>
@@ -140,7 +124,8 @@
                 Preservando a <br> <span class="text-accent italic">História da Música</span>
             </h1>
             <p class="text-gray-400 text-lg md:text-xl font-light mb-8">
-                Explore nosso catálogo interativo de fichas técnicas. Descubra os músicos, produtores, estúdios e a arte por trás dos maiores álbuns de todos os tempos.
+                Explore nosso catálogo interativo de fichas técnicas. Descubra os músicos, produtores, estúdios e a arte
+                por trás dos maiores álbuns de todos os tempos.
             </p>
         </div>
         <div class="hidden md:flex gap-4">
@@ -151,9 +136,9 @@
         </div>
     </header>
 
-    <!-- Main Content / Gallery Grid -->
+    <!-- Main Content -->
     <main class="flex-grow px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto w-full pb-24">
-        
+
         <!-- VIEW: HOME (Galeria Principal) -->
         <div id="view-home" class="view-section block">
             <!-- Filtros Ativos -->
@@ -168,21 +153,21 @@
             <!-- Loader Inicial -->
             <div id="loader" class="text-center py-20">
                 <i class="fa-solid fa-circle-notch fa-spin text-4xl text-accent mb-4"></i>
-                <h3 class="text-xl text-gray-300 font-medium">Conectando ao banco de dados...</h3>
+                <h3 class="text-xl text-gray-300 font-medium">Carregando acervo...</h3>
                 <p class="text-gray-500 mt-2">Buscando discos na sua planilha.</p>
             </div>
 
             <div id="catalogGrid" class="hidden grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6 gap-y-10">
-                <!-- Os cards serão injetados aqui via JS -->
+                <!-- Cards via JS -->
             </div>
-            
-            <!-- Empty State (Busca ou Erro) -->
+
+            <!-- Empty State (Busca/Erro) -->
             <div id="emptyState" class="hidden py-20 text-center">
                 <i class="fa-solid fa-compact-disc text-6xl text-gray-700 mb-4" id="emptyIcon"></i>
                 <h3 class="text-xl text-gray-300 font-medium" id="emptyTitle">Nenhum álbum encontrado</h3>
                 <p class="text-gray-500 mt-2" id="emptyDesc">Tente buscar por outros termos.</p>
             </div>
-        </div> <!-- Fim View Home -->
+        </div>
 
         <!-- VIEW: ARTISTAS -->
         <div id="view-artistas" class="view-section hidden">
@@ -206,48 +191,36 @@
 
     <!-- Modal de Detalhes do Álbum -->
     <div id="albumModal" class="fixed inset-0 z-50 hidden" aria-labelledby="modal-title" role="dialog" aria-modal="true">
-        <!-- Backdrop -->
         <div class="fixed inset-0 bg-black/90 backdrop-blur-sm transition-opacity" id="modalBackdrop"></div>
 
         <div class="fixed inset-0 z-10 overflow-y-auto">
             <div class="flex min-h-full items-center justify-center p-0 md:p-4 text-center sm:p-0">
-                
-                <!-- Modal Panel -->
-                <div id="modalPanel" class="relative transform overflow-hidden bg-brand-950 md:rounded-2xl border border-gray-800 text-left shadow-2xl transition-all w-full h-full md:h-auto md:max-w-6xl flex flex-col md:flex-row modal-exit">
+                <div id="modalPanel" class="relative transform overflow-hidden bg-brand-950 md:rounded-2xl border border-gray-800 text-left shadow-2xl transition-all w-full h-full md:h-auto md:max-w-5xl flex flex-col md:flex-row modal-exit">
                     
-                    <!-- Botão Fechar Modal -->
                     <button onclick="closeModal()" class="absolute top-4 right-4 z-20 w-10 h-10 bg-black/50 hover:bg-accent hover:text-brand-950 text-white rounded-full flex items-center justify-center transition-all backdrop-blur-md">
                         <i class="fa-solid fa-times text-lg"></i>
                     </button>
 
-                    <!-- Lado Esquerdo: Galeria de Imagens -->
+                    <!-- Lado Esquerdo: Imagens -->
                     <div class="w-full md:w-2/5 bg-black p-6 flex flex-col gap-4 border-r border-gray-800 sticky top-0 md:relative h-[50vh] md:h-auto overflow-hidden">
-                        
-                        <!-- Imagem Principal -->
                         <div class="relative w-full aspect-square rounded-xl overflow-hidden group bg-brand-900 border border-gray-800 shadow-2xl">
                             <img id="modalMainImg" src="" alt="Capa" class="w-full h-full object-cover fade-in cursor-zoom-in transition-transform duration-500 group-hover:scale-105" onclick="toggleFullscreen(this)">
                             <div class="absolute bottom-3 left-3 bg-black/70 backdrop-blur text-xs px-2 py-1 rounded text-gray-300 pointer-events-none" id="modalImgCaption">Capa Frontal</div>
                         </div>
 
-                        <!-- Miniaturas da Galeria -->
                         <div class="mt-auto">
                             <h4 class="text-xs uppercase tracking-wider text-gray-500 mb-3 font-semibold">Galeria de Encartes</h4>
-                            <div id="modalThumbnails" class="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
-                                <!-- Miniaturas injetadas via JS -->
-                            </div>
+                            <div id="modalThumbnails" class="flex gap-3 overflow-x-auto pb-2 scrollbar-hide"></div>
                         </div>
                     </div>
 
-                    <!-- Lado Direito: Ficha Técnica -->
+                    <!-- Lado Direito: Info -->
                     <div class="w-full md:w-3/5 p-6 md:p-10 overflow-y-auto max-h-[100vh] md:max-h-[85vh]">
-                        
-                        <!-- Cabeçalho do Álbum -->
                         <div class="mb-8">
                             <h2 id="modalTitle" class="text-3xl md:text-5xl font-serif font-bold text-white mb-2 leading-tight"></h2>
                             <h3 id="modalArtist" class="text-xl md:text-2xl text-gray-400 font-light"></h3>
                         </div>
 
-                        <!-- Metadados Rápidos (Grid) -->
                         <div class="grid grid-cols-2 gap-4 mb-10 pb-8 border-b border-gray-800">
                             <div>
                                 <p class="text-xs text-gray-500 uppercase tracking-wider mb-1">Lançamento</p>
@@ -259,44 +232,32 @@
                             </div>
                         </div>
 
-                        <!-- Ficha Técnica (Créditos) -->
                         <div>
                             <h4 class="text-lg font-serif text-white mb-4 border-l-2 border-accent pl-3">Ficha Técnica</h4>
-                            <div id="modalCredits" class="space-y-4 text-gray-300 text-sm leading-relaxed whitespace-pre-line">
-                                <!-- Injetado via JS -->
-                            </div>
+                            <div id="modalCredits" class="space-y-4 text-gray-300 text-sm leading-relaxed whitespace-pre-line"></div>
                         </div>
-                        
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Fullscreen Image Viewer -->
+    <!-- Fullscreen Viewer -->
     <div id="fullscreenViewer" class="fixed inset-0 z-[60] hidden bg-black/95 items-center justify-center backdrop-blur-lg" onclick="closeFullscreen()">
         <button class="absolute top-6 right-6 text-white text-3xl hover:text-accent transition"><i class="fa-solid fa-times"></i></button>
         <img id="fullscreenImg" src="" class="max-h-[90vh] max-w-[90vw] object-contain shadow-2xl" alt="Fullscreen">
     </div>
 
-    <!-- Footer -->
     <footer class="bg-black py-8 border-t border-gray-900 mt-auto text-center">
         <p class="text-gray-600 text-sm">© 2026 Acervo de Fichas Técnicas.</p>
     </footer>
 
     <script>
+        // === COLAR A URL DO GOOGLE APPS SCRIPT AQUI ABAIXO ===
         const API_URL = 'https://script.google.com/macros/s/AKfycbyoztioVcbFm1T1ydOwal5nRVxLqwO6UfCepu2eZPtXBDnrVMiQXlV5fOYWxf9XzBrbFg/exec';
+        
+        let db = []; 
 
-        let db = []; // Variável unificada para armazenar os dados processados
-
-        // Elementos DOM principais
-        const catalogGrid = document.getElementById('catalogGrid');
-        const emptyState = document.getElementById('emptyState');
-        const loader = document.getElementById('loader');
-        const searchInput = document.getElementById('searchInput');
-        const totalAlbums = document.getElementById('totalAlbums');
-
-        // Função utilitária: Converter link de compartilhamento do Drive para link direto
         function converterLinkDrive(url) {
             if (!url) return '';
             const match = url.match(/\/d\/([a-zA-Z0-9_-]+)/) || url.match(/id=([a-zA-Z0-9_-]+)/);
@@ -306,7 +267,6 @@
             return url.trim();
         }
 
-        // 1. Carregar os Dados da Planilha
         async function carregarDiscos() {
             try {
                 const response = await fetch(API_URL);
@@ -314,11 +274,9 @@
                 
                 const rawData = await response.json();
                 
-                // Mapeia os dados brutos da planilha para o formato esperado pelo site
                 db = rawData.map(item => {
                     const coverUrl = converterLinkDrive(item.capa);
                     
-                    // Constrói a galeria de imagens (Capa + Encartes)
                     let gallery = [{ url: coverUrl, caption: "Capa Frontal" }];
                     if (item.encartes && Array.isArray(item.encartes)) {
                         item.encartes.forEach((encarteUrl, idx) => {
@@ -331,11 +289,45 @@
                         });
                     }
 
+                    // ====== LÓGICA INTELIGENTE DE DATA ======
+                    let dataCrua = item.ano;
+                    let dataModal = dataCrua; // Data que vai aparecer na ficha (ex: 21/08/1997)
+                    let anoMenu = dataCrua;   // Ano que vai pro menu/filtro (ex: 1997)
+
+                    if (dataCrua) {
+                        // Se o Google enviou o formato técnico (ex: 1997-08-21T03:00:00.000Z)
+                        if (typeof dataCrua === 'string' && dataCrua.includes('T') && dataCrua.includes('-')) {
+                            const dataParte = dataCrua.split('T')[0]; // Pega só o 1997-08-21
+                            const [ano, mes, dia] = dataParte.split('-');
+                            dataModal = `${dia}/${mes}/${ano}`;
+                            anoMenu = ano;
+                        } 
+                        // Se for texto normal digitado na planilha
+                        else {
+                            const textoData = String(dataCrua).trim();
+                            // Se tiver barras, ex: "21/08/1997"
+                            if (textoData.includes('/')) {
+                                const pedacos = textoData.split('/');
+                                dataModal = textoData;
+                                anoMenu = pedacos[pedacos.length - 1]; // Pega só a última parte
+                            } else {
+                                // Se for só o ano (ex: "1973")
+                                dataModal = textoData;
+                                anoMenu = textoData;
+                            }
+                        }
+                    } else {
+                        dataModal = 'N/A';
+                        anoMenu = 'N/A';
+                    }
+                    // =========================================
+
                     return {
                         id: item.id || Math.random().toString(36).substr(2, 9),
                         title: item.titulo || 'Sem Título',
                         artist: item.artista || 'Artista Desconhecido',
-                        year: item.ano || 'N/A',
+                        fullDate: dataModal, // Usado na Ficha Técnica (com dia e mês)
+                        year: anoMenu,       // Usado nos menus e botões (só o ano)
                         label: item.gravadora || 'Independente',
                         cover: coverUrl,
                         gallery: gallery,
@@ -343,41 +335,33 @@
                     };
                 });
 
-                // Esconde o loader e renderiza a interface
-                loader.classList.add('hidden');
+                document.getElementById('loader').classList.add('hidden');
                 renderCatalog(db);
 
             } catch (error) {
-                console.error("Erro ao carregar do Google Sheets:", error);
-                mostrarErro("Erro de Conexão", "Não foi possível carregar os dados. Verifique a URL e as permissões do Apps Script.");
+                console.error("Erro:", error);
+                document.getElementById('loader').classList.add('hidden');
+                document.getElementById('emptyState').classList.remove('hidden');
+                document.getElementById('emptyIcon').className = "fa-solid fa-triangle-exclamation text-6xl text-red-500/50 mb-4";
+                document.getElementById('emptyTitle').innerText = "Erro ao carregar dados";
+                document.getElementById('emptyDesc').innerText = "Verifique o link do Apps Script.";
             }
         }
 
-        function mostrarErro(titulo, mensagem) {
-            loader.classList.add('hidden');
-            catalogGrid.classList.add('hidden');
-            emptyState.classList.remove('hidden');
-            document.getElementById('emptyIcon').className = "fa-solid fa-triangle-exclamation text-6xl text-red-500/50 mb-4";
-            document.getElementById('emptyTitle').innerText = titulo;
-            document.getElementById('emptyDesc').innerText = mensagem;
-        }
-
-        // 2. Renderizar a Galeria Principal
         function renderCatalog(albums) {
-            catalogGrid.innerHTML = '';
-            totalAlbums.innerText = db.length; 
+            const grid = document.getElementById('catalogGrid');
+            const empty = document.getElementById('emptyState');
+            grid.innerHTML = '';
+            document.getElementById('totalAlbums').innerText = db.length; 
 
             if (albums.length === 0) {
-                catalogGrid.classList.add('hidden');
-                emptyState.classList.remove('hidden');
-                document.getElementById('emptyIcon').className = "fa-solid fa-compact-disc text-6xl text-gray-700 mb-4";
-                document.getElementById('emptyTitle').innerText = "Nenhum álbum encontrado";
-                document.getElementById('emptyDesc').innerText = "Tente buscar por outros termos.";
+                grid.classList.add('hidden');
+                empty.classList.remove('hidden');
                 return;
             }
 
-            catalogGrid.classList.remove('hidden');
-            emptyState.classList.add('hidden');
+            grid.classList.remove('hidden');
+            empty.classList.add('hidden');
 
             albums.forEach(album => {
                 const card = document.createElement('div');
@@ -386,7 +370,7 @@
 
                 card.innerHTML = `
                     <div class="relative w-full aspect-square rounded-lg overflow-hidden mb-3 bg-brand-900 border border-gray-800 shadow-md">
-                        <img src="${album.cover}" alt="${album.title}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" onerror="this.src='https://placehold.co/800x800/1e293b/f8fafc?text=Sem+Capa&font=inter'">
+                        <img src="${album.cover}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" onerror="this.src='https://placehold.co/800x800/1e293b/f8fafc?text=Sem+Capa&font=inter'">
                         <div class="play-overlay absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 transition-opacity duration-300">
                             <div class="w-12 h-12 rounded-full bg-accent text-brand-950 flex items-center justify-center shadow-lg transform scale-90 group-hover:scale-100 transition-transform">
                                 <i class="fa-solid fa-list-ul"></i>
@@ -399,17 +383,16 @@
                             <p class="text-gray-400 text-sm truncate">${album.artist}</p>
                         </div>
                         <div class="mt-2 flex items-center justify-between text-xs text-gray-500">
-                            <span>${album.year}</span>
+                            <span>${album.year}</span> <!-- Aqui aparece só o ano -->
                             <span class="px-2 py-0.5 bg-gray-800 rounded text-gray-300">${album.label}</span>
                         </div>
                     </div>
                 `;
-                catalogGrid.appendChild(card);
+                grid.appendChild(card);
             });
         }
 
-        // Lógica de Busca (Search Bar)
-        searchInput.addEventListener('input', (e) => {
+        document.getElementById('searchInput').addEventListener('input', (e) => {
             const term = e.target.value.toLowerCase();
             const filtered = db.filter(a => 
                 a.title.toLowerCase().includes(term) || 
@@ -419,7 +402,6 @@
             renderCatalog(filtered);
         });
 
-        // 3. Lógica do Modal de Detalhes
         const modal = document.getElementById('albumModal');
         const modalPanel = document.getElementById('modalPanel');
         
@@ -427,16 +409,12 @@
             const album = db.find(a => a.id === id);
             if (!album) return;
 
-            // Preencher Textos Simples
             document.getElementById('modalTitle').innerText = album.title;
             document.getElementById('modalArtist').innerText = album.artist;
-            document.getElementById('modalYear').innerText = album.year;
+            document.getElementById('modalYear').innerText = album.fullDate; // Aqui aparece a data completa!
             document.getElementById('modalLabel').innerText = album.label;
-            
-            // Ficha Técnica (com quebra de linha preservada via classe 'whitespace-pre-line' no HTML)
             document.getElementById('modalCredits').innerText = album.credits;
 
-            // Configurar Galeria de Imagens do Modal
             setMainImage(album.gallery[0].url, album.gallery[0].caption);
             const thumbsContainer = document.getElementById('modalThumbnails');
             thumbsContainer.innerHTML = '';
@@ -446,7 +424,6 @@
                 btn.className = `flex-shrink-0 w-16 h-16 rounded-md overflow-hidden border-2 transition-all ${index === 0 ? 'border-accent scale-105' : 'border-transparent opacity-60 hover:opacity-100 hover:border-gray-500'}`;
                 btn.onclick = () => {
                     setMainImage(img.url, img.caption);
-                    // Atualizar estado ativo (borda dourada)
                     Array.from(thumbsContainer.children).forEach(c => {
                         c.classList.remove('border-accent', 'scale-105');
                         c.classList.add('border-transparent', 'opacity-60');
@@ -454,11 +431,10 @@
                     btn.classList.add('border-accent', 'scale-105');
                     btn.classList.remove('border-transparent', 'opacity-60');
                 };
-                btn.innerHTML = `<img src="${img.url}" class="w-full h-full object-cover" alt="Thumbnail" onerror="this.src='https://placehold.co/800x800/1e293b/f8fafc?text=Indisponível&font=inter'">`;
+                btn.innerHTML = `<img src="${img.url}" class="w-full h-full object-cover" onerror="this.src='https://placehold.co/800x800/1e293b/f8fafc?text=Indisponível&font=inter'">`;
                 thumbsContainer.appendChild(btn);
             });
 
-            // Exibir Modal
             modal.classList.remove('hidden');
             modalPanel.classList.remove('modal-exit');
             modalPanel.classList.add('modal-enter');
@@ -485,70 +461,52 @@
             }, 200);
         }
 
-        // Fechar modal via teclado/clique
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape' && !modal.classList.contains('hidden')) {
                 if(!document.getElementById('fullscreenViewer').classList.contains('hidden')){
                     closeFullscreen();
-                } else {
-                    closeModal();
-                }
+                } else { closeModal(); }
             }
         });
         document.getElementById('modalBackdrop').addEventListener('click', closeModal);
 
-        // Visualizador de Imagem em Tela Cheia
-        const fullscreenViewer = document.getElementById('fullscreenViewer');
-        const fullscreenImg = document.getElementById('fullscreenImg');
-
-        function toggleFullscreen(imgElement) {
-            fullscreenImg.src = imgElement.src;
-            fullscreenViewer.classList.remove('hidden');
-            fullscreenViewer.classList.add('flex');
+        function toggleFullscreen(img) {
+            document.getElementById('fullscreenImg').src = img.src;
+            document.getElementById('fullscreenViewer').classList.remove('hidden');
+            document.getElementById('fullscreenViewer').classList.add('flex');
         }
 
         function closeFullscreen() {
-            fullscreenViewer.classList.add('hidden');
-            fullscreenViewer.classList.remove('flex');
+            document.getElementById('fullscreenViewer').classList.add('hidden');
+            document.getElementById('fullscreenViewer').classList.remove('flex');
         }
 
-        // 4. Lógica de Navegação Interna (Filtros e Views)
         function applyFilter(type, value) {
-            searchInput.value = '';
+            document.getElementById('searchInput').value = '';
             const filtered = db.filter(a => a[type] === value);
             renderCatalog(filtered);
             
-            const activeFilters = document.getElementById('activeFilters');
-            const filterLabel = document.getElementById('filterLabel');
+            const af = document.getElementById('activeFilters');
+            af.classList.remove('hidden'); af.classList.add('flex');
             
-            activeFilters.classList.remove('hidden');
-            activeFilters.classList.add('flex');
-            
-            let typeName = type === 'artist' ? 'Artista' : (type === 'year' ? 'Ano' : 'Gravadora');
-            filterLabel.innerHTML = `<b>${typeName}:</b> ${value}`;
+            let tName = type === 'artist' ? 'Artista' : (type === 'year' ? 'Ano' : 'Gravadora');
+            document.getElementById('filterLabel').innerHTML = `<b>${tName}:</b> ${value}`;
         }
 
         function clearFilters() {
-            const activeFilters = document.getElementById('activeFilters');
-            activeFilters.classList.add('hidden');
-            activeFilters.classList.remove('flex');
-            
-            searchInput.value = '';
+            document.getElementById('activeFilters').classList.add('hidden');
+            document.getElementById('activeFilters').classList.remove('flex');
+            document.getElementById('searchInput').value = '';
             renderCatalog(db);
             window.scrollTo(0,0);
         }
 
         function switchView(viewName) {
             document.querySelectorAll('.view-section').forEach(el => {
-                el.classList.add('hidden');
-                el.classList.remove('block');
+                el.classList.add('hidden'); el.classList.remove('block');
             });
-            
             const target = document.getElementById(`view-${viewName}`);
-            if(target) {
-                target.classList.remove('hidden');
-                target.classList.add('block');
-            }
+            if(target) { target.classList.remove('hidden'); target.classList.add('block'); }
             
             if(viewName === 'artistas') renderCategoryView('artist', 'artistasGrid');
             if(viewName === 'anos') renderCategoryView('year', 'anosGrid');
@@ -560,7 +518,6 @@
         function renderCategoryView(type, gridId) {
             const grid = document.getElementById(gridId);
             grid.innerHTML = '';
-            
             const items = [...new Set(db.map(a => a[type]))].sort();
             
             items.forEach(item => {
@@ -568,10 +525,7 @@
                 const card = document.createElement('div');
                 card.className = 'bg-brand-900 border border-gray-800 p-6 rounded-xl hover:bg-brand-800 hover:border-gray-600 cursor-pointer transition-all flex flex-col items-center justify-center text-center group shadow-sm hover:shadow-md hover:-translate-y-1';
                 
-                card.onclick = () => {
-                    switchView('home');
-                    applyFilter(type, item);
-                };
+                card.onclick = () => { switchView('home'); applyFilter(type, item); };
                 
                 card.innerHTML = `
                     <span class="text-xl text-white font-serif mb-3 group-hover:text-accent transition-colors line-clamp-2">${item}</span>
@@ -581,11 +535,7 @@
             });
         }
 
-        // Inicializar aplicação
-        window.onload = () => {
-            carregarDiscos();
-        };
-
+        window.onload = carregarDiscos;
     </script>
 </body>
 </html>
