@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Acervo de Fichas Técnicas</title>
+    <title>Acervo de Fichas Técnicas | Discos Históricos</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -123,7 +123,7 @@
             </h1>
             <p class="text-gray-400 text-lg md:text-xl font-light mb-8">
                 Explore nosso catálogo interativo de fichas técnicas. Descubra os músicos, produtores, estúdios e a arte
-                por trás dos álbuns.
+                por trás dos maiores álbuns de todos os tempos.
             </p>
         </div>
         <div class="hidden md:flex gap-4">
@@ -151,7 +151,7 @@
             <div id="loader" class="text-center py-20">
                 <i class="fa-solid fa-circle-notch fa-spin text-4xl text-accent mb-4"></i>
                 <h3 class="text-xl text-gray-300 font-medium">Carregando acervo...</h3>
-                <p class="text-gray-500 mt-2">Buscando discos</p>
+                <p class="text-gray-500 mt-2">Buscando discos na sua planilha.</p>
             </div>
 
             <div id="catalogGrid" class="hidden grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6 gap-y-10">
@@ -351,27 +351,22 @@
                     // ====== FORMATAÇÃO DA FICHA TÉCNICA (COM CONTROLE DE ESPAÇAMENTO) ======
                     let fichaFormatada = "";
                     if (item.ficha) {
-                        // Divide por quebra de linha, MAS preserva as linhas em branco!
                         const linhas = String(item.ficha).split('\n');
                         
                         fichaFormatada = linhas.map(linha => {
                             let texto = linha.trim();
                             
-                            // Se for uma linha vazia (2x Alt+Enter), cria um espaçamento (gap)
                             if (texto === '') {
                                 return `<div class="h-4"></div>`; 
                             }
 
-                            // Negrito automático antes dos dois pontos
                             if (texto.includes(':')) {
                                 const partes = texto.split(':');
                                 const rotulo = partes[0].trim();
                                 const valor = partes.slice(1).join(':').trim();
-                                // Uso de leading-relaxed (espaçamento normal de leitura), sem margem extra
                                 return `<div class="leading-relaxed"><strong class="text-white font-medium">${rotulo}:</strong> <span class="text-gray-300">${valor}</span></div>`;
                             }
                             
-                            // Linhas normais (sem dois pontos)
                             return `<div class="leading-relaxed text-gray-300">${texto}</div>`;
                         }).join('');
                     } else {
@@ -452,13 +447,32 @@
             });
         }
 
+        // ==========================================
+        // NOVA LÓGICA DA BARRA DE BUSCA CORRIGIDA
+        // ==========================================
         document.getElementById('searchInput').addEventListener('input', (e) => {
             const term = e.target.value.toLowerCase();
-            const filtered = db.filter(a => 
-                a.title.toLowerCase().includes(term) || 
-                a.artist.toLowerCase().includes(term) ||
-                a.year.toString().includes(term)
-            );
+            
+            // 1. Força a visualização da tela inicial (Galeria)
+            document.querySelectorAll('.view-section').forEach(el => {
+                el.classList.add('hidden'); el.classList.remove('block');
+            });
+            const targetHome = document.getElementById('view-home');
+            targetHome.classList.remove('hidden'); targetHome.classList.add('block');
+            
+            // 2. Remove os avisos de filtros ativos para não causar confusão visual
+            document.getElementById('activeFilters').classList.add('hidden');
+            document.getElementById('activeFilters').classList.remove('flex');
+
+            // 3. Busca de forma segura convertendo todos os campos para texto
+            const filtered = db.filter(a => {
+                const tituloSeguro = String(a.title).toLowerCase();
+                const artistaSeguro = String(a.artist).toLowerCase();
+                const anoSeguro = String(a.year).toLowerCase();
+                
+                return tituloSeguro.includes(term) || artistaSeguro.includes(term) || anoSeguro.includes(term);
+            });
+            
             renderCatalog(filtered);
         });
 
