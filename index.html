@@ -266,16 +266,6 @@
         
         let db = []; 
 
-        function converterLinkDrive(url) {
-            if (!url) return '';
-            const textoUrl = String(url).trim();
-            const match = textoUrl.match(/\/d\/([a-zA-Z0-9_-]+)/) || textoUrl.match(/id=([a-zA-Z0-9_-]+)/);
-            if (match && match[1]) {
-                return `https://drive.google.com/thumbnail?id=${match[1]}&sz=w1000`;
-            }
-            return textoUrl;
-        }
-
         async function carregarDiscos() {
             try {
                 const response = await fetch(API_URL);
@@ -284,21 +274,24 @@
                 const rawData = await response.json();
                 
                 db = rawData.map(item => {
-                    const coverUrl = converterLinkDrive(item.capa);
                     
-                    let gallery = [{ url: coverUrl, caption: "Capa Frontal" }];
-                    
-                    if (item.encartes) {
-                        const listaEncartes = Array.isArray(item.encartes) ? item.encartes : String(item.encartes).split(',');
-                        listaEncartes.forEach((encarteUrl, idx) => {
-                            if (encarteUrl && encarteUrl.trim() !== '') {
-                                gallery.push({
-                                    url: converterLinkDrive(encarteUrl),
-                                    caption: `Encarte ${idx + 1}`
-                                });
-                            }
+                    // --- NOVA LÓGICA DE IMAGENS POR PASTA ---
+                    let gallery = [];
+                    let coverUrl = 'https://placehold.co/800x800/1e293b/f8fafc?text=Sem+Capa&font=inter';
+
+                    if (item.imagens && item.imagens.length > 0) {
+                        coverUrl = item.imagens[0]; // A primeira foto da pasta (ex: 01.jpg) vira a capa
+                        
+                        item.imagens.forEach((imgUrl, idx) => {
+                            gallery.push({
+                                url: imgUrl,
+                                caption: idx === 0 ? "Capa Frontal" : `Encarte ${idx}`
+                            });
                         });
+                    } else {
+                         gallery.push({ url: coverUrl, caption: "Sem Imagem" });
                     }
+                    // ----------------------------------------
 
                     // ====== TRATAMENTO DE DATA ======
                     let dataCrua = item.ano;
