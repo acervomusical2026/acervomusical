@@ -27,7 +27,7 @@
                             900: '#1a1d21',
                             950: '#0d0f12',
                         },
-                        accent: '#d4af37' // Gold accent for a premium feel
+                        accent: '#d4af37' 
                     }
                 }
             }
@@ -139,7 +139,6 @@
 
         <!-- VIEW: HOME (Galeria Principal) -->
         <div id="view-home" class="view-section block">
-            <!-- Filtros Ativos -->
             <div id="activeFilters" class="hidden items-center gap-3 mb-6 bg-brand-900/50 p-3 rounded-lg border border-gray-800 w-fit">
                 <span class="text-sm text-gray-400"><i class="fa-solid fa-filter mr-1"></i> Filtrando por:</span>
                 <span id="filterLabel" class="px-3 py-1 bg-accent/20 border border-accent text-accent rounded-full text-sm font-medium"></span>
@@ -159,7 +158,6 @@
                 <!-- Cards via JS -->
             </div>
 
-            <!-- Empty State (Busca/Erro) -->
             <div id="emptyState" class="hidden py-20 text-center">
                 <i class="fa-solid fa-compact-disc text-6xl text-gray-700 mb-4" id="emptyIcon"></i>
                 <h3 class="text-xl text-gray-300 font-medium" id="emptyTitle">Nenhum álbum encontrado</h3>
@@ -230,7 +228,7 @@
                             </div>
                         </div>
 
-                        <!-- Separação Vertical para Faixas e Ficha -->
+                        <!-- Grid para Faixas e Ficha Técnica Lado a Lado (se houver faixas) -->
                         <div class="space-y-10">
                             
                             <!-- Lista de Faixas -->
@@ -242,7 +240,7 @@
                             <!-- Ficha Técnica -->
                             <div>
                                 <h4 class="text-lg font-serif text-white mb-4 border-l-2 border-accent pl-3">Ficha Técnica</h4>
-                                <div id="modalCredits" class="space-y-3 text-gray-300 text-sm leading-relaxed"></div>
+                                <div id="modalCredits" class="text-sm"></div>
                             </div>
 
                         </div>
@@ -263,7 +261,7 @@
     </footer>
 
     <script>
-        // === SUA URL DO GOOGLE APPS SCRIPT ===
+        // === SUA URL DO GOOGLE APPS SCRIPT AQUI ===
         const API_URL = 'https://script.google.com/macros/s/AKfycbyoztioVcbFm1T1ydOwal5nRVxLqwO6UfCepu2eZPtXBDnrVMiQXlV5fOYWxf9XzBrbFg/exec';
         
         let db = []; 
@@ -335,38 +333,49 @@
                     const listaArtistas = item.artista ? String(item.artista).split(separador).map(s => s.trim()).filter(Boolean) : ['Artista Desconhecido'];
                     const listaGravadoras = item.gravadora ? String(item.gravadora).split(separador).map(s => s.trim()).filter(Boolean) : ['Independente'];
 
-                    // ====== FORMATAÇÃO DAS FAIXAS (COM DETECÇÃO DE "LADO A/B") ======
+                    // ====== FORMATAÇÃO DAS FAIXAS ======
                     let faixasFormatadas = "";
                     if (item.faixas) {
                         const linhasFaixas = String(item.faixas).split('\n').filter(l => l.trim() !== '');
                         faixasFormatadas = linhasFaixas.map(linha => {
                             let texto = linha.trim();
-                            // Se a linha começar com "Lado" (ex: Lado A, Lado 1), formata como título
                             if (texto.toLowerCase().startsWith('lado')) {
                                 return `<div class="mt-5 mb-2 text-accent font-semibold tracking-wider uppercase text-xs">${texto}</div>`;
                             }
-                            // Senão, formata como uma faixa normal com o ícone musical
                             return `<div class="py-1.5 border-b border-gray-800/40 text-gray-300 hover:text-white transition-colors flex items-start"><span class="text-accent/50 mr-3 text-xs mt-0.5"><i class="fa-solid fa-music"></i></span> <span>${texto}</span></div>`;
                         }).join('');
                     } else {
                         faixasFormatadas = "<div class='text-gray-500 italic'>Lista de faixas não cadastrada.</div>";
                     }
 
-                    // ====== FORMATAÇÃO DA FICHA TÉCNICA ======
+                    // ====== FORMATAÇÃO DA FICHA TÉCNICA (COM CONTROLE DE ESPAÇAMENTO) ======
                     let fichaFormatada = "";
                     if (item.ficha) {
+                        // Divide por quebra de linha, MAS preserva as linhas em branco!
                         const linhas = String(item.ficha).split('\n');
+                        
                         fichaFormatada = linhas.map(linha => {
-                            if (linha.includes(':')) {
-                                const partes = linha.split(':');
+                            let texto = linha.trim();
+                            
+                            // Se for uma linha vazia (2x Alt+Enter), cria um espaçamento (gap)
+                            if (texto === '') {
+                                return `<div class="h-4"></div>`; 
+                            }
+
+                            // Negrito automático antes dos dois pontos
+                            if (texto.includes(':')) {
+                                const partes = texto.split(':');
                                 const rotulo = partes[0].trim();
                                 const valor = partes.slice(1).join(':').trim();
-                                return `<div><strong class="text-white font-semibold">${rotulo}:</strong> <span class="text-gray-300">${valor}</span></div>`;
+                                // Uso de leading-relaxed (espaçamento normal de leitura), sem margem extra
+                                return `<div class="leading-relaxed"><strong class="text-white font-medium">${rotulo}:</strong> <span class="text-gray-300">${valor}</span></div>`;
                             }
-                            return `<div>${linha}</div>`;
+                            
+                            // Linhas normais (sem dois pontos)
+                            return `<div class="leading-relaxed text-gray-300">${texto}</div>`;
                         }).join('');
                     } else {
-                        fichaFormatada = "Ficha técnica não cadastrada.";
+                        fichaFormatada = "<div class='text-gray-500 italic'>Ficha técnica não cadastrada.</div>";
                     }
 
                     return {
@@ -465,7 +474,6 @@
             document.getElementById('modalYear').innerText = album.fullDate; 
             document.getElementById('modalLabel').innerText = album.label;
             
-            // Inserindo Faixas e Ficha Técnica
             document.getElementById('modalTracks').innerHTML = album.tracks; 
             document.getElementById('modalCredits').innerHTML = album.credits; 
 
@@ -600,3 +608,6 @@
     </script>
 </body>
 </html>
+```
+
+Pode atualizar no seu GitHub! (Apenas não se esqueça de colocar novamente o seu link do Apps Script na `linha 281`).
