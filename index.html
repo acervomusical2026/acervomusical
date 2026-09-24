@@ -262,7 +262,7 @@
 
     <script>
         // === SUA URL DO GOOGLE APPS SCRIPT AQUI ===
-        const API_URL = 'https://script.google.com/macros/s/AKfycbxRHFRwUCokfzcTdrzWV2wSakqaucqxM7DUFnACpQyEimCq3ub5aO_dNU56dG82IFE9rA/exec';
+        const API_URL = 'https://script.google.com/macros/u/1/s/AKfycbxRHFRwUCokfzcTdrzWV2wSakqaucqxM7DUFnACpQyEimCq3ub5aO_dNU56dG82IFE9rA/exec';
         
         let db = []; 
 
@@ -507,12 +507,28 @@
         const modal = document.getElementById('albumModal');
         const modalPanel = document.getElementById('modalPanel');
         
+        function fecharEFiltrarArtista(nomeArtista) {
+            closeModal();
+            // Espera a animação do modal fechar (200ms) antes de mudar os discos no fundo
+            setTimeout(() => {
+                switchView('home');
+                applyFilter('artist', nomeArtista);
+            }, 250);
+        }
+
         function openModal(id) {
             const album = db.find(a => a.id === id);
             if (!album) return;
 
             document.getElementById('modalTitle').innerText = album.title;
-            document.getElementById('modalArtist').innerText = album.artist;
+            
+            // Mapeia a lista de artistas e cria um elemento clicável para cada um, separando por um ponto elegante
+            const artistLinks = album.artistList.map(nome => 
+                `<span onclick="fecharEFiltrarArtista(this.innerText)" class="hover:text-accent hover:underline cursor-pointer transition-colors relative z-10" title="Ver todos os álbuns de ${nome}">${nome}</span>`
+            ).join('<span class="text-gray-700 mx-2 text-sm">•</span>');
+            
+            document.getElementById('modalArtist').innerHTML = artistLinks;
+
             document.getElementById('modalYear').innerText = album.fullDate; 
             document.getElementById('modalLabel').innerText = album.label;
             
