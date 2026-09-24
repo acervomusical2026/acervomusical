@@ -326,17 +326,52 @@
                     const listaArtistas = item.artista ? String(item.artista).split(separador).map(s => s.trim()).filter(Boolean) : ['Artista Desconhecido'];
                     const listaGravadoras = item.gravadora ? String(item.gravadora).split(separador).map(s => s.trim()).filter(Boolean) : ['Independente'];
 
-                    // ====== FORMATAÇÃO DAS FAIXAS ======
+                   // ====== FORMATAÇÃO DAS FAIXAS ======
                     let faixasFormatadas = "";
                     if (item.faixas) {
-                        const linhasFaixas = String(item.faixas).split('\n').filter(l => l.trim() !== '');
-                        faixasFormatadas = linhasFaixas.map(linha => {
-                            let texto = linha.trim();
-                            if (texto.toLowerCase().startsWith('lado')) {
-                                return `<div class="mt-5 mb-2 text-accent font-semibold tracking-wider uppercase text-xs">${texto}</div>`;
+                        const linhas = String(item.faixas).split('\n').map(l => l.trim()).filter(l => l !== '');
+                        let listHTML = [];
+
+                        for(let i = 0; i < linhas.length; i++) {
+                            let texto = linhas[i];
+                            let textoLower = texto.toLowerCase();
+
+                            // 1. Identifica se é o título do Lado (Ex: LADO A:)
+                            if (textoLower.startsWith('lado')) {
+                                listHTML.push(`<div class="mt-6 mb-2 text-accent font-semibold tracking-wider uppercase text-xs border-b border-accent/20 pb-1">${texto}</div>`);
                             }
-                            return `<div class="py-1.5 border-b border-gray-800/40 text-gray-300 hover:text-white transition-colors flex items-start"><span class="text-accent/50 mr-3 text-xs mt-0.5"><i class="fa-solid fa-music"></i></span> <span>${texto}</span></div>`;
-                        }).join('');
+                            // 2. Prevenção: caso haja um 'Comp:' perdido na primeira linha
+                            else if (textoLower.startsWith('comp') || texto.startsWith('(') || texto.startsWith('-') || texto.startsWith('[')) {
+                                listHTML.push(`<div class="pb-2 border-b border-gray-800/40 text-gray-500 text-xs pl-7 italic">${texto}</div>`);
+                            }
+                            // 3. É uma faixa de música normal!
+                            else {
+                                // Abre o bloco da música
+                                let trackHTML = `<div class="py-2 border-b border-gray-800/40 hover:bg-white/5 transition-colors group px-1 rounded-sm">`;
+                                
+                                // Coloca o nome da música com o ícone
+                                trackHTML += `<div class="flex items-start text-gray-300 group-hover:text-white transition-colors">`;
+                                trackHTML += `<span class="text-accent/50 mr-3 text-xs mt-0.5"><i class="fa-solid fa-music"></i></span>`;
+                                trackHTML += `<span>${texto}</span>`;
+                                trackHTML += `</div>`;
+
+                                // 4. A MÁGICA: Olha para as próximas linhas na planilha. 
+                                // Se começar com "Comp", "(", "-" ou "[", ele embute como detalhe desta mesma música!
+                                while(i + 1 < linhas.length) {
+                                    let prox = linhas[i+1].toLowerCase();
+                                    if (prox.startsWith('comp') || prox.startsWith('(') || prox.startsWith('-') || prox.startsWith('[')) {
+                                        i++; // Avança para a próxima linha
+                                        trackHTML += `<div class="text-xs text-gray-500 pl-7 mt-1 italic">${linhas[i]}</div>`;
+                                    } else {
+                                        break; // Se for outra música, para de procurar e fecha o bloco
+                                    }
+                                }
+
+                                trackHTML += `</div>`;
+                                listHTML.push(trackHTML);
+                            }
+                        }
+                        faixasFormatadas = listHTML.join('');
                     } else {
                         faixasFormatadas = "<div class='text-gray-500 italic'>Lista de faixas não cadastrada.</div>";
                     }
