@@ -399,14 +399,14 @@
                     };
                 });
 
+                // Inverte a ordem da lista para que os últimos discos adicionados na planilha apareçam primeiro no site
+                db.reverse();
+
                 document.getElementById('loader').classList.add('hidden');
                 renderCatalog(db);
 
             } catch (error) {
-                console.error("Erro completo da conexão:", error);
-                document.getElementById('loader').classList.add('hidden');
-                document.getElementById('emptyState').classList.remove('hidden');
-                document.getElementById('emptyIcon').className = "fa-solid fa-triangle-exclamation text-6xl text-red-500/50 mb-4";
+                console.error("Erro:", error);
                 document.getElementById('emptyTitle').innerText = "Erro no código ou conexão";
                 document.getElementById('emptyDesc').innerText = "Ocorreu um erro ao estruturar os dados. Verifique a planilha ou recarregue a página.";
             }
