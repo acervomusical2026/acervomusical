@@ -261,7 +261,7 @@
     </footer>
 
     <script>
-        // === SUA URL DO GOOGLE APPS SCRIPT AQUI ===
+        // === SUA URL DO GOOGLE APPS SCRIPT AQUI (Já mantida!) ===
         const API_URL = 'https://script.google.com/macros/u/1/s/AKfycbxRHFRwUCokfzcTdrzWV2wSakqaucqxM7DUFnACpQyEimCq3ub5aO_dNU56dG82IFE9rA/exec';
         
         let db = []; 
@@ -269,7 +269,7 @@
         async function carregarDiscos() {
             try {
                 const response = await fetch(API_URL);
-                if (!response.ok) throw new Error('Falha na resposta da rede');
+                if (!response.ok) throw new Error('Falha na conexão com a planilha');
                 
                 const rawData = await response.json();
                 
@@ -280,8 +280,7 @@
                     let coverUrl = 'https://placehold.co/800x800/1e293b/f8fafc?text=Sem+Capa&font=inter';
 
                     if (item.imagens && item.imagens.length > 0) {
-                        coverUrl = item.imagens[0]; // A primeira foto da pasta (ex: 01.jpg) vira a capa
-                        
+                        coverUrl = item.imagens[0]; 
                         item.imagens.forEach((imgUrl, idx) => {
                             gallery.push({
                                 url: imgUrl,
@@ -291,8 +290,7 @@
                     } else {
                          gallery.push({ url: coverUrl, caption: "Sem Imagem" });
                     }
-                    // ----------------------------------------
-
+                    
                     // ====== TRATAMENTO DE DATA ======
                     let dataCrua = item.ano;
                     let dataModal = 'N/A'; 
@@ -300,7 +298,6 @@
 
                     if (dataCrua !== undefined && dataCrua !== null && String(dataCrua).trim() !== '') {
                         let textoData = String(dataCrua).trim();
-
                         if (textoData.includes('T') && textoData.includes('-')) {
                             let dataParte = textoData.split('T')[0]; 
                             let partes = dataParte.split('-'); 
@@ -308,16 +305,13 @@
                                 anoMenu = partes[0]; 
                                 dataModal = `${partes[2]}/${partes[1]}/${partes[0]}`; 
                             } else {
-                                dataModal = textoData;
-                                anoMenu = textoData;
+                                dataModal = textoData; anoMenu = textoData;
                             }
                         } else if (textoData.includes('/')) {
                             let partes = textoData.split('/');
-                            dataModal = textoData;
-                            anoMenu = partes[partes.length - 1].trim();
+                            dataModal = textoData; anoMenu = partes[partes.length - 1].trim();
                         } else {
-                            dataModal = textoData;
-                            anoMenu = textoData;
+                            dataModal = textoData; anoMenu = textoData;
                         }
                     }
 
@@ -336,34 +330,26 @@
                             let texto = linhas[i];
                             let textoLower = texto.toLowerCase();
 
-                            // 1. Identifica se é o título do Lado (Ex: LADO A:)
                             if (textoLower.startsWith('lado')) {
                                 listHTML.push(`<div class="mt-6 mb-2 text-accent font-semibold tracking-wider uppercase text-xs border-b border-accent/20 pb-1">${texto}</div>`);
                             }
-                            // 2. Prevenção: caso haja um 'Comp:' perdido na primeira linha
                             else if (textoLower.startsWith('comp') || texto.startsWith('(') || texto.startsWith('-') || texto.startsWith('[')) {
                                 listHTML.push(`<div class="pb-2 border-b border-gray-800/40 text-gray-500 text-xs pl-7 italic">${texto}</div>`);
                             }
-                            // 3. É uma faixa de música normal!
                             else {
-                                // Abre o bloco da música
                                 let trackHTML = `<div class="py-2 border-b border-gray-800/40 hover:bg-white/5 transition-colors group px-1 rounded-sm">`;
-                                
-                                // Coloca o nome da música com o ícone
                                 trackHTML += `<div class="flex items-start text-gray-300 group-hover:text-white transition-colors">`;
                                 trackHTML += `<span class="text-accent/50 mr-3 text-xs mt-0.5"><i class="fa-solid fa-music"></i></span>`;
                                 trackHTML += `<span>${texto}</span>`;
                                 trackHTML += `</div>`;
 
-                                // 4. A MÁGICA: Olha para as próximas linhas na planilha. 
-                                // Se começar com "Comp", "(", "-" ou "[", ele embute como detalhe desta mesma música!
                                 while(i + 1 < linhas.length) {
                                     let prox = linhas[i+1].toLowerCase();
                                     if (prox.startsWith('comp') || prox.startsWith('(') || prox.startsWith('-') || prox.startsWith('[')) {
-                                        i++; // Avança para a próxima linha
+                                        i++; 
                                         trackHTML += `<div class="text-xs text-gray-500 pl-7 mt-1 italic">${linhas[i]}</div>`;
                                     } else {
-                                        break; // Se for outra música, para de procurar e fecha o bloco
+                                        break; 
                                     }
                                 }
 
@@ -383,18 +369,13 @@
                         
                         fichaFormatada = linhas.map(linha => {
                             let texto = linha.trim();
-                            
-                            if (texto === '') {
-                                return `<div class="h-4"></div>`; 
-                            }
-
+                            if (texto === '') return `<div class="h-4"></div>`; 
                             if (texto.includes(':')) {
                                 const partes = texto.split(':');
                                 const rotulo = partes[0].trim();
                                 const valor = partes.slice(1).join(':').trim();
                                 return `<div class="leading-relaxed"><strong class="text-white font-medium">${rotulo}:</strong> <span class="text-gray-300">${valor}</span></div>`;
                             }
-                            
                             return `<div class="leading-relaxed text-gray-300">${texto}</div>`;
                         }).join('');
                     } else {
@@ -422,12 +403,12 @@
                 renderCatalog(db);
 
             } catch (error) {
-                console.error("Erro:", error);
+                console.error("Erro completo da conexão:", error);
                 document.getElementById('loader').classList.add('hidden');
                 document.getElementById('emptyState').classList.remove('hidden');
                 document.getElementById('emptyIcon').className = "fa-solid fa-triangle-exclamation text-6xl text-red-500/50 mb-4";
-                document.getElementById('emptyTitle').innerText = "Erro ao carregar dados";
-                document.getElementById('emptyDesc').innerText = "Verifique o link do Apps Script.";
+                document.getElementById('emptyTitle').innerText = "Erro no código ou conexão";
+                document.getElementById('emptyDesc').innerText = "Ocorreu um erro ao estruturar os dados. Verifique a planilha ou recarregue a página.";
             }
         }
 
@@ -475,24 +456,18 @@
             });
         }
 
-        // ==========================================
-        // NOVA LÓGICA DA BARRA DE BUSCA CORRIGIDA
-        // ==========================================
         document.getElementById('searchInput').addEventListener('input', (e) => {
             const term = e.target.value.toLowerCase();
             
-            // 1. Força a visualização da tela inicial (Galeria)
             document.querySelectorAll('.view-section').forEach(el => {
                 el.classList.add('hidden'); el.classList.remove('block');
             });
             const targetHome = document.getElementById('view-home');
             targetHome.classList.remove('hidden'); targetHome.classList.add('block');
             
-            // 2. Remove os avisos de filtros ativos para não causar confusão visual
             document.getElementById('activeFilters').classList.add('hidden');
             document.getElementById('activeFilters').classList.remove('flex');
 
-            // 3. Busca de forma segura convertendo todos os campos para texto
             const filtered = db.filter(a => {
                 const tituloSeguro = String(a.title).toLowerCase();
                 const artistaSeguro = String(a.artist).toLowerCase();
@@ -509,7 +484,6 @@
         
         function fecharEFiltrarArtista(nomeArtista) {
             closeModal();
-            // Espera a animação do modal fechar (200ms) antes de mudar os discos no fundo
             setTimeout(() => {
                 switchView('home');
                 applyFilter('artist', nomeArtista);
@@ -522,7 +496,6 @@
 
             document.getElementById('modalTitle').innerText = album.title;
             
-            // Mapeia a lista de artistas e cria um elemento clicável para cada um, separando por um ponto elegante
             const artistLinks = album.artistList.map(nome => 
                 `<span onclick="fecharEFiltrarArtista(this.innerText)" class="hover:text-accent hover:underline cursor-pointer transition-colors relative z-10" title="Ver todos os álbuns de ${nome}">${nome}</span>`
             ).join('<span class="text-gray-700 mx-2 text-sm">•</span>');
