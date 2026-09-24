@@ -326,7 +326,7 @@
                     const listaArtistas = item.artista ? String(item.artista).split(separador).map(s => s.trim()).filter(Boolean) : ['Artista Desconhecido'];
                     const listaGravadoras = item.gravadora ? String(item.gravadora).split(separador).map(s => s.trim()).filter(Boolean) : ['Independente'];
 
-                   // ====== FORMATAÇÃO DAS FAIXAS ======
+                    // ====== FORMATAÇÃO DAS FAIXAS ======
                     let faixasFormatadas = "";
                     if (item.faixas) {
                         const linhas = String(item.faixas).split('\n').map(l => l.trim()).filter(l => l !== '');
